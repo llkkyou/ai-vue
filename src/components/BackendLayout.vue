@@ -4,7 +4,7 @@
       <Sidebar />
       <el-container>
         <el-header>
-          <Newbar />
+          <Navbar />
         </el-header>
         <el-main>
           <router-view />
@@ -16,7 +16,7 @@
 
 <script setup name="App">
 import Sidebar from './Sidebar.vue'
-import Newbar from './Newbar.vue'
+import Navbar from './Navbar.vue'
 
 </script>
 
