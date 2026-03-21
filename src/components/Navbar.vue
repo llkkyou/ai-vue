@@ -1,7 +1,7 @@
 <template>
   <div class="navbar">
     <div class="flex-box">
-      <el-button>
+      <el-button @click="toggleCollapse">
         <el-icon>
           <Expand />
         </el-icon>
@@ -28,6 +28,7 @@
 </template>
 
 <script setup name="Navbar">
+import { useAdminStore } from '@/stores/admin'
 const handleCommand = (command) => {
   // console.log(command)
   if (command === 'logout') {
@@ -35,6 +36,12 @@ const handleCommand = (command) => {
     console.log('退出登录')
   }
 }
+
+// 切换侧边栏折叠状态
+const toggleCollapse = () => {
+  useAdminStore().toggleCollapse()
+}
+
 </script>
 
 <style lang="scss" scoped>
