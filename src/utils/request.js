@@ -29,8 +29,8 @@ service.interceptors.response.use(
     // 对响应数据做点什么
     const { data, config } = response
     // 处理业务状态码
-    if (data.code === 200) {
-      return data
+    if (data.code === '200') {
+      return data.data
     } else {
       if (data.code === '-1') {
         if (!config.url?.includes('/login')) {

@@ -32,6 +32,9 @@
 <script setup name="login">
 import { ref, reactive } from 'vue'
 import { login } from '@/api/admin'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const ruleFormRef = ref()
 
@@ -56,6 +59,7 @@ const submitForm = async (formEl) => {
     if (valid) {
       // console.log('登录成功', fields)
       login(formData).then(data => {
+        console.log(data.data)  // 先打印出来看看结构
         // 判断token是否存在
         if (!data.token) {
           return console.log('登录失败，token不存在')
@@ -63,8 +67,12 @@ const submitForm = async (formEl) => {
         // 登录成功，保存token和用户信息
         localStorage.setItem('token', data.token)
         localStorage.setItem('userInfo', JSON.stringify(data.userInfo))
-        // 登录成功，跳转到首页
-        // window.location.href = '/'
+        // 根据用户角色跳转不同路径
+        if (data.userInfo.userType === 2) {
+          router.push('/back/dashboard')
+        } else {
+          // router.push('/')
+        }
       })
     }
   })
