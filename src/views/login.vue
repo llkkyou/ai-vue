@@ -31,6 +31,7 @@
 
 <script setup name="login">
 import { ref, reactive } from 'vue'
+import { login } from '@/api/admin'
 
 const ruleFormRef = ref()
 
@@ -51,9 +52,20 @@ const rules = reactive({
 // 登录
 const submitForm = async (formEl) => {
   if (!formEl) return
-  await formEl.value.validate((valid, fields) => {
+  await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log('登录成功', fields)
+      // console.log('登录成功', fields)
+      login(formData).then(data => {
+        // 判断token是否存在
+        if (!data.token) {
+          return console.log('登录失败，token不存在')
+        }
+        // 登录成功，保存token和用户信息
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('userInfo', JSON.stringify(data.userInfo))
+        // 登录成功，跳转到首页
+        // window.location.href = '/'
+      })
     }
   })
 }
