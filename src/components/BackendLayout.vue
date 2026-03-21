@@ -1,0 +1,31 @@
+<template>
+  <div class="backend-layout">
+    <el-container class="main-container">
+      <Sidebar />
+      <el-container>
+        <el-header>
+          <Newbar />
+        </el-header>
+        <el-main>
+          <router-view />
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
+</template>
+
+<script setup name="App">
+import Sidebar from './Sidebar.vue'
+import Newbar from './Newbar.vue'
+
+</script>
+
+<style lang="scss" scoped>
+.backend-layout {
+  height: 100vh;
+
+  .main-container {
+    height: 100%;
+  }
+}
+</style>
