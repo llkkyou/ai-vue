@@ -29,7 +29,7 @@
       </el-table-column>
       <el-table-column prop="authorName" label="作者" width="150" />
       <el-table-column prop="readCount" label="阅读量" width="150" />
-      <el-table-column prop="publishedAt" label="发布时间" width="150" />
+      <el-table-column prop="updatedAt" label="发布时间" width="150" />
       <el-table-column label="操作" fixed="right" width="240">
         <template #default="scope">
           <el-button text type="primary">编辑</el-button>
@@ -41,7 +41,7 @@
     </el-table>
     <el-pagination style="margin-top:25px" :page-size="pagination.size" layout="prev, pager, next"
       :total="pagination.total" @change="handleChange" />
-    <ArticleDialog v-model:modelValue="dialogVisible" :categoryies="categoryies" />
+    <ArticleDialog v-model:modelValue="dialogVisible" :categoryies="categoryies" @success="handleSuccess" />
   </div>
 </template>
 
@@ -71,7 +71,7 @@ const pagination = reactive({
   total: 0
 })
 
-const handleSearch = async (formData) => {
+const handleSearch = async (formData = {}) => {
   console.log(formData, '查询参数')
   const params = {
     ...pagination,
@@ -98,6 +98,14 @@ const categoryies = ref([])
 const tableData = ref([])
 // 新增和编辑
 const dialogVisible = ref(false)
+
+// 新增成功
+const handleSuccess = () => {
+  // 关闭对话框
+  dialogVisible.value = false
+  // 刷新文章列表
+  handleSearch()
+}
 
 onMounted(async () => {
   const data = await categoryTree()
