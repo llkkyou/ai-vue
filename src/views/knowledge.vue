@@ -2,11 +2,46 @@
   <div>
     <PageHead title="知识文章">
       <template #buttons>
-        <el-button type="primary">新增</el-button>
-        <el-button type="primary">删除</el-button>
+        <el-button @click="dialogVisible = true" type="primary">新增</el-button>
       </template>
     </PageHead>
     <TableSearch :formItem="formItem" @search="handleSearch" />
+    <el-table :data="tableData" style="width: 100%;margin-top: 25px">
+      <el-table-column width="500" label="文章标题" fixed="left">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <el-icon>
+              <timer />
+            </el-icon>
+            <span>{{ scope.row.title }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="分类">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <el-icon>
+              <timer />
+            </el-icon>
+            <span>{{ categoryMap[scope.row.categoryId] }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="authorName" label="作者" width="150" />
+      <el-table-column prop="readCount" label="阅读量" width="150" />
+      <el-table-column prop="publishedAt" label="发布时间" width="150" />
+      <el-table-column label="操作" fixed="right" width="240">
+        <template #default="scope">
+          <el-button text type="primary">编辑</el-button>
+          <el-button v-if="scope.row.status === 0 || scope.row.status === 2" text type="success">发布</el-button>
+          <el-button v-if="scope.row.status === 1" text type="warning">下线</el-button>
+          <el-button text type="danger">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination style="margin-top:25px" :page-size="pagination.size" layout="prev, pager, next"
+      :total="pagination.total" @change="handleChange" />
+    <ArticleDialog v-model:modelValue="dialogVisible" :categoryies="categoryies" />
   </div>
 </template>
 
@@ -15,6 +50,7 @@ import { onMounted, ref, reactive } from 'vue'
 import PageHead from '@/components/PageHead.vue'
 import TableSearch from '@/components/TableSearch.vue'
 import { categoryTree, artclePage } from '@/api/admin'
+import ArticleDialog from '@/components/ArticleDialog.vue'
 
 const formItem = [
   { comp: 'input', prop: 'title', label: '文章标题', placeholder: '请输入文章标题' },
@@ -28,14 +64,41 @@ const formItem = [
   }
 ]
 
-const handleSearch = (formData) => {
+// 分页参数
+const pagination = reactive({
+  currentPage: 1,
+  size: 10,
+  total: 0
+})
+
+const handleSearch = async (formData) => {
   console.log(formData, '查询参数')
+  const params = {
+    ...pagination,
+    ...formData
+  }
+
+  const { records, total } = await artclePage(params)
+  // console.log(data, '文章列表')
+  tableData.value = records
+  pagination.total = total
+}
+
+// 分页改变
+const handleChange = (page) => {
+  pagination.currentPage = page
+  handleSearch()
 }
 
 // 分类映射
 const categoryMap = reactive({})
 // 分类列表
 const categoryies = ref([])
+// 列表数据
+const tableData = ref([])
+// 新增和编辑
+const dialogVisible = ref(false)
+
 onMounted(async () => {
   const data = await categoryTree()
   // console.log(data, '分类树')
@@ -47,5 +110,8 @@ onMounted(async () => {
     }
   })
   formItem[1].options = categoryies.value
+
+  // 获取列表
+  handleSearch()
 })
 </script>
