@@ -120,6 +120,7 @@ const formData = reactive({
   "categoryId": 1,
   "summary": "",
   "tags": "",
+  "tagArray": [],
   "id": ""
 })
 
