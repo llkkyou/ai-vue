@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="文章详情" v-model="dialogVisible" width="50%" @close="handleClose">
+    <el-dialog :title="isEdit ? '编辑文章' : '文章详情'" v-model="dialogVisible" width="50%" @close="handleClose">
 
       <el-form :model="formData" :rules="rules" ref="formRef" label-width="120px">
         <el-form-item label="文章标题" prop="title">
@@ -47,16 +47,16 @@
       <template #footer>
         <el-button @click="btnPreview = !btnPreview">{{ btnPreview ? '关闭预览' : '预览效果' }}</el-button>
         <el-button @click="handleClose">取消</el-button>
-        <el-button @click="handleSubmit" :loading="loading">创建文章</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="loading">{{ isEdit ? '更新文章' : '创建文章' }}</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup name="ArticleDialog">
-import { ref, reactive, computed, nextTick } from 'vue'
+import { ref, reactive, computed, nextTick, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { uploadFile, createArticle } from '@/api/admin'
+import { uploadFile, createArticle, updateArticle } from '@/api/admin'
 import { fileBaseUrl } from '@/config/index.js'
 import RichTextEditor from '@/components/RichTextEditor.vue'
 
@@ -68,6 +68,10 @@ const props = defineProps({
   categoryies: {
     type: Array,
     default: () => []
+  },
+  article: {
+    type: Object,
+    default: null
   }
 })
 
@@ -81,7 +85,32 @@ const dialogVisible = computed({
   }
 })
 
-const handleClose = () => { }
+const isEdit = computed(() => !!props.article?.id)
+
+// 监听编辑数据
+watch(() => props.article, (newVal) => {
+  if (newVal) {
+    nextTick(() => {
+      Object.assign(formData, newVal)
+      // 使用现有ID
+      businessId.value = newVal.id
+      // 封面Url
+      imgUrl.value = fileBaseUrl + newVal.coverImage
+    })
+  }
+})
+
+const handleClose = () => {
+  // 重置表单
+  formRef.value.resetFields()
+  // 重置ID
+  businessId.value = null
+  // 重置标签
+  formData.tagArray = []
+  // 重置封面图片和数据
+  handleRemove()
+  emit('update:modelValue', false)
+}
 
 // 表单数据
 const formData = reactive({
@@ -91,7 +120,6 @@ const formData = reactive({
   "categoryId": 1,
   "summary": "",
   "tags": "",
-  "tagArray": [],
   "id": ""
 })
 
@@ -133,11 +161,12 @@ const beforeUpload = (file) => {
   return true
 }
 
+const businessId = ref(null)
 const handleUploadRequest = async ({ file }) => {
   // UUID生成
-  const businessId = crypto.randomUUID()
+  businessId.value = crypto.randomUUID()
   const fileRes = await uploadFile(file, {
-    businessId: businessId
+    businessId: businessId.value
   })
   console.log(fileRes)
 
@@ -186,10 +215,18 @@ const handleSubmit = () => {
     }
     delete submitData.tagArray
 
-    createArticle(submitData).then(res => {
-      loading.value = false
-      emit('success')
-    })
+    if (!isEdit.value) {
+      submitData.id = businessId.value
+      createArticle(submitData).then(res => {
+        loading.value = false
+        emit('success')
+      })
+    } else {
+      updateArticle(props.article.id, submitData).then(res => {
+        loading.value = false
+        emit('success')
+      })
+    }
   })
 }
 </script>
