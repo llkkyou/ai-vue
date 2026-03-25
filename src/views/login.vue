@@ -59,7 +59,7 @@ const submitForm = async (formEl) => {
     if (valid) {
       // console.log('登录成功', fields)
       login(formData).then(data => {
-        console.log(data.data)  // 先打印出来看看结构
+        console.log(data)  // 先打印出来看看结构
         // 判断token是否存在
         if (!data.token) {
           return console.log('登录失败，token不存在')
@@ -71,7 +71,7 @@ const submitForm = async (formEl) => {
         if (data.userInfo.userType === 2) {
           router.push('/back/dashboard')
         } else {
-          // router.push('/')
+          router.push('/')
         }
       })
     }

@@ -30,9 +30,10 @@
 
 <script setup name="FrontendLayout">
 import { logout } from '@/api/admin'
-import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import { ElMessageBox } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const iconUrl = new URL('@/assets/images/机器人.png', import.meta.url).href
 
@@ -42,6 +43,16 @@ onMounted(() => {
   isLoggedIn.value = localStorage.getItem('token') !== null
 })
 
+// 退出登录
+const handleLogout = () => {
+  logout().then(() => {
+    // 清除缓存
+    localStorage.removeItem('token')
+    localStorage.removeItem('userInfo')
+    // 跳转到登录页
+    router.push('/auth/login')
+  })
+}
 </script>
 
 

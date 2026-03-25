@@ -93,7 +93,7 @@ const router = createRouter({
   routes: [...backhandRoutes, ...frontendRoutes]
 })
 
-/* // 路由前置守卫
+// 路由前置守卫
 router.beforeEach((to, from, next) => {
   // 检查是否有token
   const token = localStorage.getItem('token')
@@ -107,7 +107,12 @@ router.beforeEach((to, from, next) => {
         next('/auth/dashboard')
       }
     } else if (userInfo.userType === 1) {
-
+      // 用户端的账号只能访问前台路由
+      if (to.path.startsWith('/back') || to.path.startsWith('/auth')) {
+        next('/')
+      } else {
+        next()
+      }
     }
   } else {
     if (to.path === '/back') {
@@ -115,9 +120,9 @@ router.beforeEach((to, from, next) => {
       next('/auth/login')
     } else {
       // 如果是访问其他页面，跳转到登录页
-      next('/auth/login')
+      next()
     }
   }
-}) */
+})
 
 export default router
