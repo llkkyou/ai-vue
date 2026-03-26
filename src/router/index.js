@@ -101,10 +101,10 @@ router.beforeEach((to, from, next) => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'))
     // 如果是后台用户
     if (userInfo.userType === 2) {
-      if (to.path === '/back') {
+      if (to.path.startsWith('/back')) {
         next()
       } else {
-        next('/auth/dashboard')
+        next('/back/dashboard')
       }
     } else if (userInfo.userType === 1) {
       // 用户端的账号只能访问前台路由
