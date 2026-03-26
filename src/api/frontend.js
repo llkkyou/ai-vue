@@ -23,3 +23,15 @@ export const getSessionDetail = (sessionId) => {
 export const getSessionEmotion = (sessionId) => {
   return service.get(`/psychological-chat/sessions/${sessionId}/emotion`)
 }
+
+export const addEmotionDiary = (data) => {
+  return service.post('/emotion-diary', data)
+}
+
+export const getKnowledgeList = (params) => {
+  return service.get('/knowledge/article/page', { params })
+}
+
+export const getKnowledgeDetail = (articleId) => {
+  return service.get(`/knowledge/article/${articleId}`)
+}
